@@ -15,7 +15,7 @@ Werewolf was inspired by [spyfall](https://github.com/evanbrumley/spyfall) and [
 # Installing
 #### Instructions
 1. Clone the repo to get started
-2. Run `npm install` and `npm start` to launch the server
+2. Run `meteor run` to launch the server
 3. Go to `localhost:3000` in your browser
 
 ## License

@@ -245,7 +245,14 @@ a {
     background-color: #f9f9f9;
 }
 
-#btn-werewolf-turn {
+.btn-werewolf-turn {
+  &:disabled {
+    background-color: #BEC4C0;
+    cursor: default;
+  }
+}
+
+.btn-seer-turn {
   &:disabled {
     background-color: #BEC4C0;
     cursor: default;

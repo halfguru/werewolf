@@ -337,8 +337,15 @@ Template.gameRole.events({
   }
 });
 
+
+
+//////////////
+////Night/////
+//////////////
+
 Template.night.rendered = function (event) {
   gl.tts("Werewolves, wake up and look for other werewolves");
+  Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "werewolf"}});
 };
 
 Template.night.helpers({
@@ -382,43 +389,89 @@ Template.night.helpers({
   voted: function() {
     playerId = Session.get("playerID");
     player = Players.findOne(playerId);
-    return player.vote == true;
+    return player.voted == true;
   },
 
   werewolf: function() {
     playerId = Session.get("playerID");
     player = Players.findOne(playerId);
     return player.role == "Werewolf";
+  },
+  werewolf_turn: function(){
+    return Games.findOne(Session.get("gameID")).turn == "werewolf";
+  },
+
+  seer: function() {
+    playerId = Session.get("playerID");
+    player = Players.findOne(playerId);
+    return player.role == "Seer";
+  },
+  seer_turn: function(){
+    return Games.findOne(Session.get("gameID")).turn == "seer";
+  },
+
+   seer_name: function(){
+    return Session.get("seer_name");
+  },
+
+   seer_role: function(){
+    return Session.get("seer_role");
   }
 });
 
 Template.night.events({
   'click .btn-leave': gl.leaveGame,
-  'click #btn-werewolf-turn': function () {
-    $("#btn-werewolf-turn").attr('disabled', true);
-    /*var game = gl.getCurrentGame();
-    var player = gl.getCurrentPlayer();
-    var players = Players.find({'gameID': game._id}, {'sort': {'createdAt': 1}}).fetch();
-    Players.update(player._id, {$set: {state: 'waitingForPlayersInGame'}});
-    var nbPlayers = Players.find({state: 'waitingForPlayersInGame'}).count();
-    if (nbPlayers == players.length){
-      Games.update(game._id, {$set: {state: 'night'}});
-    */
+  'click .btn-werewolf-turn': function () {
+    $(".btn-werewolf-turn").attr('disabled', true);
+    let playerID = Session.get("playerID");
+    let game = Games.findOne(Session.get("gameID"));
+    player = Players.findOne(playerID);
     player_selected = this._id;
-    Players.update(player_selected, {$set: {voted: true}});
+    Players.update(player._id, {$set: {voted: true}});
     if (1){
       if (1){
         Players.update(player_selected, {$set: {state: "dead"}});
+        seer_dead = Players.findOne({role: 'Seer'}).state == "dead";
+        if (seer_dead){
+          Games.update(game._id, {$set: {state: 'day'}});
+        }
+        else{
+          Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "seer"}})
+        }
+
       }
       else{
         FlashMessages.sendError("Werewolves didnt vote for the same person!");
 
       }
     }
-
-
-
   },
+
+  'click .btn-seer-turn': function () {
+    $(".btn-seer-turn").attr('disabled', true);
+    var playerID = Session.get("playerID");
+    player = Players.findOne(playerID);
+    Session.set("seer_name",this.name);
+    Session.set("seer_role",this.role);
+
+    if (1){
+      if (1){
+        Players.update(player._id, {$set: {voted: true}});
+      }
+      else{
+        FlashMessages.sendError("Seers didnt vote for the same person!");
+
+      }
+    }
+  },
+
+  'click .btn-seer': function () {
+    var game = Games.findOne(Session.get("gameID"));
+    Games.update(game._id, {$set: {state: 'day'}})
+  },
+
+
+
   'click .btn-toggle-status': function () {
     $(".status-container-content").toggle();
   },
@@ -433,6 +486,45 @@ Template.night.events({
   },
   'click .location-name-striked': function(event) {
     event.target.className = 'location-name';
+  }
+});
+
+//////////////
+/////Day//////
+//////////////
+
+Template.day.rendered = function (event) {
+  let playerId = Session.get("playerID");
+  let roomId = Session.get("gameID");
+  let room = Games.findOne(roomId);
+
+  if (playerId === room.owner){
+      Games.update(room._id, {$set: {round: room.round+1}});
+      gl.tts("It's the day");
+    }
+
+  //Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "werewolf"}});
+};
+
+Template.day.helpers({
+  game: gl.getCurrentGame,
+  player: gl.getCurrentPlayer,
+
+  room: function() {
+    let roomId = Session.get("gameID");
+    let room = Games.findOne("gameID");
+    return room;
+  },
+
+  round: function() {
+    let roomId = Session.get("gameID");
+    let room = Games.findOne(roomId);
+    return room.round;
+  }
+});
+Template.day.events({
+  'click .btn-toggle-status': function () {
+    $(".status-container-content").toggle();
   }
 });
 

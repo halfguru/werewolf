@@ -239,25 +239,88 @@
     {{/each}}
   </ul>
   <hr>
-  <!-- Dead or Alive -->
-  {{# if dead }}
+
+  {{# if dead }}   <!-- Dead -->
     <p>
       <h3 style="color: #BF3630;">you are dead.</h3><br />
       <span>Dead men tell no tales. Shh...</span>
     </p>
-  {{/ if }}
 
+  {{ else }}   <!-- Alive -->
+  {{# if werewolf_turn}}
   {{# if werewolf }}
   Select which player to kill
   <div class="button-container">
     {{#each players }}
-      <button id="btn-werewolf-turn">{{ name }}</button>
+      <button class="btn-werewolf-turn">{{ name }}</button>
        {{/each}}
-    </div>
-  {{ else }}
+  </div>
+  {{ else }}  <!-- WW turn but not a WW -->
   Werewolves are choosing which player to kill
+  {{/ if }} <!-- identity -->
 
-  {{/ if}}
+  {{ else if seer_turn}}
+  {{# if seer }}
+  {{# if voted}} <!-- Seer turn and voted -->
+
+  {{ seer_name }} is the {{ seer_role }}.
+  <br>
+  Press OK to confirm and go back to sleep.
+  <button class="btn-seer">OK</button>
+
+  {{ else }}   <!-- Seer turn and not voted -->
+  Select which player you want to see the card
+  <div class="button-container">
+    {{#each players }}
+      <button class="btn-seer-turn">{{ name }}</button>
+       {{/each}}
+  </div>
+
+  {{/ if }}
+  {{ else }} <!-- Seer turn but not a seer -->
+  Seer is choosing which card to see
+  {{/ if }}
+
+
+  {{/ if }} <!--turn-->
+  {{/ if }} <!--Dead-->
+</template>
+
+<template name="day">
+  <h4><a class="game-round">Round {{ round }}</a></h4>
+    <h4><a class="game-phase">Day time</a></h4>
+  <div class="status-container">
+    <button class="btn-toggle-status">show/hide</button>
+    <div class="status-container-content">
+        <div class="player-status player-status-not-werewolf">You're the {{player.role}}</div>
+        <div class="current-location">
+        </div>
+    </div>
+  </div>
+
+  <h5>Players</h5>
+  <ul class="ingame-player-list">
+    {{#each players }}
+      <li>
+        <div class="player-name">
+          {{ name }}
+        </div>
+      </li>
+    {{/each}}
+  </ul>
+
+  <div class="u-cf"></div>
+
+  <h5>Characters</h5>
+  <ul class="character-list">
+    {{#each characters }}
+      <li>
+        <div class="location-name">{{ name }}</div>
+      </li>
+    {{/each}}
+  </ul>
+  <hr>
+  It's daytime, the village wakes up, everyone raise their heads, open their eyes.0
 </template>
 
 

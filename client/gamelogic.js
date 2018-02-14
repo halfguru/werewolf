@@ -2,7 +2,7 @@ class gl {
 
   static tts(speech){
   var msg = new SpeechSynthesisUtterance(speech);
-  window.speechSynthesis.speak(msg);
+  //window.speechSynthesis.speak(msg);
   }
 
   static getIndex(){
@@ -81,7 +81,8 @@ class gl {
     accessCode: this.generateAccessCode(),
     state: "waitingForPlayers",
     owner: null,
-    round: 1
+    round: 1,
+    turn: null
   };
 
   var gameID = Games.insert(game);
@@ -95,7 +96,7 @@ class gl {
       gameID: game._id,
       name: name,
       role: null,
-      status: "alive",
+      state: "alive",
       vote: false
     };
 
@@ -128,6 +129,9 @@ class gl {
     Session.set("currentView", "lobby");
   } else if (game.state ==="night"){
     Session.set("currentView", "night");
+  }
+  else if (game.state ==="day"){
+    Session.set("currentView", "day");
   }
 }
 
