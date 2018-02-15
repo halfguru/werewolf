@@ -81,7 +81,7 @@ class gl {
     accessCode: this.generateAccessCode(),
     state: "waitingForPlayers",
     owner: null,
-    round: 1,
+    round: 0,
     turn: null
   };
 
@@ -96,7 +96,7 @@ class gl {
       gameID: game._id,
       name: name,
       role: null,
-      state: "alive",
+      state: null,
       vote: false
     };
 

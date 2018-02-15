@@ -1,0 +1,63 @@
+<template name="lobby">
+  <h4>
+    {{#if isLoading }}
+      <span class="spinner"></span>
+    {{else}}
+      Waiting for players
+    {{/if}}
+  </h4>
+
+  <div class="access-code">
+    Enter an access code:
+    <span>{{ game.accessCode }}</span>
+  </div>
+
+  <div class="access-buttons">
+    <a class="access-button btn-toggle-qrcode" href="javascript:void(0);">
+      <i class="fa fa-qrcode"></i>
+    </a>
+
+    <span class="access-button-separator"></span>
+
+    <a class="access-button btn-send-access-code-email" href='mailto:?subject=Join my Werewolf game!,&body={{ accessLink }}'>
+      <i class="fa fa-envelope-o"></i>
+    </a>
+  </div>
+
+  <div class="qrcode-container" style="display: none;">
+    <div id="qrcode" class="qrcode"></div>
+
+    <div id="access-link" class="access-link">
+      <a href="{{ accessLink }}">{{ accessLink }}</a>
+    </div>
+  </div>
+    <div class="players-connected">
+      {{ players.length }} player(s) connected
+    </div>
+
+  <hr>
+
+  <ol class="lobby-player-list">
+    {{#each players }}
+      <li>
+        {{ name }}
+
+        {{#if isCurrent }}
+          <a href="#" class="btn-edit-player" data-player-id="{{ _id }}">
+            <i class="fa fa-pencil"></i>
+          </a>
+        {{else}}
+          <a href="#" class="btn-remove-player" data-player-id="{{ _id }}">
+            <i class="fa fa-close"></i>
+          </a>
+        {{/if}}
+      </li>
+    {{/each}}
+  </ol>
+
+  <hr>
+
+  {{# if owner }}
+    <button class="btn-start" {{ ready players }}>start game</button>
+  {{/ if }}
+</template>

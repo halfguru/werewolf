@@ -1,0 +1,69 @@
+<head>
+  <meta charset="utf-8">
+  <title>Werewolf</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/normalize.css" type="text/css">
+  <link rel="stylesheet" href="css/skeleton.css" type="text/css">
+  <link rel="stylesheet" href="css/styles.css" type="text/css">
+</head>
+
+<body></body>
+
+<template name="main">
+  <div class="adspace"></div>
+  <div dir="{{ textDirection }}" class="container dir-{{textDirection}} lang-{{ language }}">
+    <div class="main-content">
+      {{> Template.dynamic template=whichView}}
+      <hr>
+      {{> footer }}
+    </div>
+  </div>
+</template>
+
+<template name="footer">
+  {{#if languages }}
+    <div dir="ltr" class="languages">
+      <select class="language-select">
+        {{#each languages }}
+            <option value="{{code}}" {{selected}}>{{toCapitalCase languageDetails.name}}</option>
+        {{/each}}
+      </select>
+      <ul class="language-list">
+        {{#each languages }}
+          <li>
+            <a class="btn-set-language" href="#" data-language="{{code}}">{{toCapitalCase languageDetails.name}}</a>
+          </li>
+        {{/each}}
+      </ul>
+    </div>
+  {{/ if}}
+
+  <div class="footer">
+    <a href='https://boardgamegeek.com/boardgame/925/werewolf' target='_blank'>Werewolf</a> designed by Simon Ho
+    <br>
+    <a href="https://github.com/halfguru/werewolf" target="_blank">View source code on Github</a>
+  </div>
+</template>
+
+<template name="startMenu">
+  <div class="main-menu">
+    <h4>Werewolf for smartphones</h4>
+
+    <hr>
+
+    <div class="button-container">
+      <button id="btn-new-game">new game</button>
+      <button id="btn-join-game">join game</button>
+    </div>
+
+    {{# if announcement }}
+      <p class="announcement">{{{ announcement }}}</p>
+    {{/if}}
+
+    {{# if alternativeURL }}
+      <p class="high-load-message">Do things seem slow or broken? We're probably under heavy load!<br>Try this alternative URL: <a href="{{ alternativeURL }}">{{ alternativeURL }}</a></p>
+    {{/if}}
+  </div>
+</template>
