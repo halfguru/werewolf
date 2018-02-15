@@ -15,6 +15,7 @@ Werewolf was inspired by [spyfall](https://github.com/evanbrumley/spyfall) and [
 # Installing
 #### Instructions
 1. Clone the repo to get started
+2. Install meteor with [Windows/Linux commands](https://www.meteor.com/install)
 2. Run `meteor run` to launch the server
 3. Go to `localhost:3000` in your browser
 
