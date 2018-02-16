@@ -1,20 +1,14 @@
-<div align="center">
-  <br>
-  <h2>
-    Browser Werewolf Game
-  </h2>
-  <br>
-  <img src="http://static1.squarespace.com/static/532a4886e4b0e5f755112794/t/5840712ab8a79b24536d6471/1480618284514/15178192_1454250567936490_238894783888087143_n.png?format=1000w"/>
-</div>
-<br>
+## Browser Werewolf Game
+![Alt Text](https://media.giphy.com/media/3Fjvhw5eNE9kSA4FBE/giphy.gif)
 
-
-# About
+## About
 Werewolf was inspired by [spyfall](https://github.com/evanbrumley/spyfall) and [Drawphone](https://github.com/tannerkrewson/drawphone/).
+You can access my game on my temporary AWS EC2 server http://54.236.18.10/. The game is still in development.
 
-# Installing
+## Installing
 #### Instructions
 1. Clone the repo to get started
+2. Install meteor with [Windows/Linux commands](https://www.meteor.com/install)
 2. Run `meteor run` to launch the server
 3. Go to `localhost:3000` in your browser
 
