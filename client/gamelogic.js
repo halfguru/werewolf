@@ -1,58 +1,75 @@
-class gl {
 
-  static tts(speech){
-  var msg = new SpeechSynthesisUtterance(speech);
-  //window.speechSynthesis.speak(msg);
-  }
+module.exports = {
 
-  static getIndex(){
-  playerID =  Players.findOne(Session.get("playerID"));
-  for (var i = 0; i < characters.length; ++i) {
-    if (characters[i].name === playerID.role) {
-      return i;
-    }
-   }
-   return -1;
- }
+  generateAccessCode: function(){
+    var code = "";
+    var dict = "abcdefghijklmnopqrstuvwxyz";
 
-  static getCurrentPlayer(){
-  var playerID = Session.get("playerID");
+      for(var i=0; i < 4; i++){
+        code += dict.charAt(Math.floor(Math.random() * dict.length));
+      }
 
-  if (playerID) {
+      return code;
+  },
+
+  generateNewGame: function(){
+    var game = {
+      accessCode: module.exports.generateAccessCode(),
+      state: "waitingForPlayers",
+      owner: null,
+      round: 1,
+      turn: null
+    };
+
+    var gameID = Games.insert(game);
+    game = Games.findOne(gameID);
+
+    return game;
+  },
+
+  generateNewPlayer: function(game, name){
+    var player = {
+      gameID: game._id,
+      name: name,
+      role: null,
+      state: null,
+      vote: false,
+      killedby: null
+    };
+
+    var playerID = Players.insert(player);
+
     return Players.findOne(playerID);
-  }
-}
+  },
 
-  static resetUserState() {
-  var player = Players.findOne(Session.get("playerID"));
+  getCurrentPlayer: function(){
+    var playerID = Session.get("playerID");
 
-  if (player){
-    Players.remove(player._id);
-  }
+    if (playerID) {
+      return Players.findOne(playerID);
+      }
+    },
 
-  Session.set("gameID", null);
-  Session.set("playerID", null);
-  }
+  resetUserState: function() {
+    var player = Players.findOne(Session.get("playerID"));
 
-  static getCurrentGame(){
-  var gameID = Session.get("gameID");
+    if (player){
+      Players.remove(player._id);
+    }
 
-  if (gameID) {
-    return Games.findOne(gameID);
-  }
-}
+    Session.set("gameID", null);
+    Session.set("playerID", null);
+    },
 
-  static getAccessLink(){
-  var game = Games.findOne(Session.get("gameID"));
+  getCurrentGame: function(){
+    var gameID = Session.get("gameID");
 
-  if (!game){
-    return;
-  }
+    if (gameID) {
+      return Games.findOne(gameID);
+    }
+  },
 
-  return Meteor.settings.public.url + game.accessCode + "/";
-}
-
-  static leaveGame () {
+  leaveGame: function() {
     var playerID = Session.get("playerID");
 
     if (playerID) {
@@ -63,78 +80,115 @@ class gl {
     Players.remove(player._id);
 
     Session.set("playerID", null);
-  }
+  },
 
-  static generateAccessCode(){
-  var code = "";
-  var dict = "abcdefghijklmnopqrstuvwxyz";
+  tts: function(speech){
+    var msg = new SpeechSynthesisUtterance(speech);
+    //window.speechSynthesis.speak(msg);
+    },
 
-    for(var i=0; i < 4; i++){
-      code += dict.charAt(Math.floor(Math.random() * dict.length));
+  getIndex: function(){
+    playerID =  Players.findOne(Session.get("playerID"));
+    for (var i = 0; i < characters.length; ++i) {
+      if (characters[i].name === playerID.role) {
+        return i;
+      }
+     }
+     return -1;
+   },
+
+    getAccessLink: function(){
+    var game = Games.findOne(Session.get("gameID"));
+
+    if (!game){
+      return;
     }
 
-    return code;
+      return Meteor.settings.public.url + game.accessCode + "/";
+    },
+
+  killedby: function(){
+    playerID = Session.get("playerID");
+    player = Players.findOne(playerID);
+    return player.killedby;
+  },
+
+  dead: function(){
+    playerID = Session.get("playerID");
+    player = Players.findOne(playerID);
+    console.log("Is the player dead: " +  player.state);
+    console.log(player.state == "dead");
+    return player.state == "dead";
+  },
+
+  win: function(){
+    var lost = null;
+    var alive = [];
+    game = Games.findOne(Session.get("gameID"));
+    aliveLength =  Players.find({'gameID': game._id, 'state': 'alive'}).fetch().length;
+    for (var i = 0; i < aliveLength; i++) {
+      alive.push(Players.find({'gameID': game._id, 'state': 'alive'}, {'sort': {'createdAt': 1}}).fetch()[i].role);
+    }
+
+    for (var i = 0; i < alive.length; i++) {
+      if (alive[i] == "Werewolf") {
+          lost = true;
+      }
+      else{
+          lost = false;
+          break;
+        }
+      }
+    if (lost){
+      return 0;
+    }
+
+    var j = alive.length;
+    while (j--) {
+       if (alive[j] === "Werewolf") {
+        return;
+       }
+    }
+    return 1;
+    },
+
+  trackGameState: function() {
+    var gameID = Session.get("gameID");
+    var playerID = Session.get("playerID");
+
+    if (!gameID || !playerID){
+      return;
+    }
+
+    var game = Games.findOne(gameID);
+    var player = Players.findOne(playerID);
+
+    if (!game || !player){
+      Session.set("gameID", null);
+      Session.set("playerID", null);
+      Session.set("currentView", "startMenu");
+      return;
+    }
+
+    if(game.state === "inProgress"){
+      Session.set("currentView", "gameRole");
+    } else if (game.state === "waitingForPlayers") {
+      Session.set("currentView", "lobby");
+    } else if (game.state ==="night"){
+      Session.set("currentView", "night");
+    }
+    else if (game.state ==="day"){
+      Session.set("currentView", "day");
+    }
+     else if (game.state === "win"){
+      Session.set("currentView", "endgame");
+      console.log("you win");
+    }
+     else if (game.state === "lose"){
+      Session.set("currentView", "endgame");
+      console.log("you lose");
+    }
+  }
+
 }
 
-  static generateNewGame(){
-  var game = {
-    accessCode: this.generateAccessCode(),
-    state: "waitingForPlayers",
-    owner: null,
-    round: 0,
-    turn: null
-  };
-
-  var gameID = Games.insert(game);
-  game = Games.findOne(gameID);
-
-  return game;
-}
-
-  static generateNewPlayer(game, name){
-    var player = {
-      gameID: game._id,
-      name: name,
-      role: null,
-      state: null,
-      vote: false
-    };
-
-    var playerID = Players.insert(player);
-
-    return Players.findOne(playerID);
-  }
-
-  static trackGameState () {
-  var gameID = Session.get("gameID");
-  var playerID = Session.get("playerID");
-
-  if (!gameID || !playerID){
-    return;
-  }
-
-  var game = Games.findOne(gameID);
-  var player = Players.findOne(playerID);
-
-  if (!game || !player){
-    Session.set("gameID", null);
-    Session.set("playerID", null);
-    Session.set("currentView", "startMenu");
-    return;
-  }
-
-  if(game.state === "inProgress"){
-    Session.set("currentView", "gameRole");
-  } else if (game.state === "waitingForPlayers") {
-    Session.set("currentView", "lobby");
-  } else if (game.state ==="night"){
-    Session.set("currentView", "night");
-  }
-  else if (game.state ==="day"){
-    Session.set("currentView", "day");
-  }
-}
-
-};
-
-export default gl;

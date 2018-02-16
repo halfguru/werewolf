@@ -1,7 +1,7 @@
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import './createGame.html';
-import gl from './gamelogic.js';
+var xd = require('./gamelogic');
 
 Template.createGame.rendered = function (event) {
   $("#player-name").focus();
@@ -15,8 +15,8 @@ Template.createGame.events({
       return false;
     }
 
-    var game = gl.generateNewGame();
-    var player = gl.generateNewPlayer(game, playerName);
+    var game = xd.generateNewGame();
+    var player = xd.generateNewPlayer(game, playerName);
 
     Meteor.subscribe('games', game.accessCode);
     Session.set("loading", true);

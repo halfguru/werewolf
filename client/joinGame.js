@@ -1,10 +1,10 @@
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import './joinGame.html';
-import gl from './gamelogic.js';
+var xd = require('./gamelogic');
 
 Template.joinGame.rendered = function (event) {
-  gl.resetUserState();
+  xd.resetUserState();
 
   var urlAccessCode = Session.get('urlAccessCode');
 
@@ -41,7 +41,7 @@ Template.joinGame.events({
 
       if (game) {
         Meteor.subscribe('players', game._id);
-        player = gl.generateNewPlayer(game, playerName);
+        player = xd.generateNewPlayer(game, playerName);
 
         if (game.state === "inProgress") {
         }

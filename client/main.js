@@ -2,6 +2,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import './main.html';
 import gl from './gamelogic.js';
+var xd = require('./gamelogic');
 
 Meteor.setInterval(function () {
   Session.set('time', new Date());
@@ -13,7 +14,7 @@ Handlebars.registerHelper('toCapitalCase', function (str) {
 });
 
 //Whenever dependencies changes, rerun.
-Tracker.autorun(gl.trackGameState);
+Tracker.autorun(xd.trackGameState);
 
 //Indicate if game code is correct or no
 FlashMessages.configure({
@@ -52,7 +53,7 @@ Template.main.helpers({
 //////////////
 
 Template.startMenu.rendered = function () {
-  gl.resetUserState();
+  xd.resetUserState();
 };
 
 Template.startMenu.events({

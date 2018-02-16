@@ -47,7 +47,6 @@
   </div>
 </template>
 
-
 <template name="night">
   <h4><a class="game-round">Round {{ round }}</a></h4>
     <h4><a class="game-phase">Night time</a></h4>
@@ -83,13 +82,15 @@
   </ul>
   <hr>
 
+  <!-- Game mechanics -->
+
   {{# if dead }}   <!-- Dead -->
     <p>
       <h3 style="color: #BF3630;">you are dead.</h3><br />
       <span>Dead men tell no tales. Shh...</span>
     </p>
-
   {{ else }}   <!-- Alive -->
+
   {{# if werewolf_turn}}
   {{# if werewolf }}
   Select which player to kill
@@ -105,14 +106,12 @@
   {{ else if seer_turn}}
   {{# if seer }}
   {{# if voted}} <!-- Seer turn and voted -->
-
   {{ seer_name }} is the {{ seer_role }}.
   <br>
   Press OK to confirm and go back to sleep.
   <div class="button-container">
   <button class="btn-seer">OK</button>
  </div>
-
   {{ else }}   <!-- Seer turn and not voted -->
   Select which player you want to see the card
   <div class="button-container">
@@ -120,11 +119,26 @@
       <button class="btn-seer-turn">{{ name }}</button>
        {{/each}}
   </div>
-
-  {{/ if }}
+  {{/ if }}  <!-- voted -->
   {{ else }} <!-- Seer turn but not a seer -->
   Seer is choosing which card to see
-  {{/ if }}
+  {{/ if }} <!-- identiy -->
+
+  {{ else if witch_turn}}
+  {{# if witch }}
+  {{# if voted}} <!-- Witch turn and voted -->
+    Witch turn
+  {{ else }} <!-- Witch turn and not voted-->
+  {{ killed_werewolf }} was killed by werewolves. Do you want to save this character, kill someone else, or do nothing.
+   <div class="button-container">
+        <button class="btn-witch-kill">Kill</button>
+        <button class="btn-witch-save">Save</button>
+        <button class="btn-witch-nothing">Do nothing</button>
+    </div>
+  {{/ if }}  <!-- voted -->
+  {{ else }} <!-- Witch turn but not a witch -->
+  The Witch is choosing to save, kill or do nothing.
+  {{/ if }} <!-- identiy -->
 
 
   {{/ if }} <!--turn-->
@@ -165,14 +179,14 @@
     {{/each}}
   </ul>
   <hr>
-  {{ #if dead }}
+  {{# if dead }}
     <p>
       <h3 style="color: #BF3630;">you are dead.</h3><br />
       <span>Dead men tell no tales. Shh...</span>
   </p>
   {{ else }}
 
-  It's daytime, {{ deadNight }} died. Everyone can vote for who to eliminate.
+  It's daytime, {{ deadNight }} died. Alive players can vote for who to eliminate.
     <div class="button-container">
     {{#each alive_players }}
       <button class="btn-day-vote">{{ name }}</button>

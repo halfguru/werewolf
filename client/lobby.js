@@ -1,18 +1,18 @@
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import './lobby.html';
-import gl from './gamelogic.js';
+var xd = require('./gamelogic');
 
 Template.lobby.rendered = function (event) {
-  var url = gl.getAccessLink();
+  var url = xd.getAccessLink();
   var qrcodesvg = new Qrcodesvg(url, "qrcode", 250);
   qrcodesvg.draw();
 };
 
 Template.lobby.events({
-  'click .btn-leave': gl.leaveGame,
+  'click .btn-leave': xd.leaveGame,
   'click .btn-start': function () {
-    var game = gl.getCurrentGame();
+    var game = xd.getCurrentGame();
     Games.update(game._id, {$set: {state: 'lobby'}});
   },
   'click .btn-toggle-qrcode': function () {
@@ -23,8 +23,8 @@ Template.lobby.events({
     Players.remove(playerID);
   },
   'click .btn-edit-player': function (event) {
-    var game = gl.getCurrentGame();
-    gl.resetUserState();
+    var game = xd.getCurrentGame();
+    xd.resetUserState();
     Session.set('urlAccessCode', game.accessCode);
     Session.set('currentView', 'joinGame');
   }
@@ -32,17 +32,17 @@ Template.lobby.events({
 
 Template.lobby.helpers({
   game: function () {
-    return gl.getCurrentGame();
+    return xd.getCurrentGame();
   },
   accessLink: function () {
-    return gl.getAccessLink();
+    return xd.getAccessLink();
   },
   player: function () {
-    return gl.getCurrentPlayer();
+    return xd.getCurrentPlayer();
   },
   players: function () {
-    var game = gl.getCurrentGame();
-    var currentPlayer = gl.getCurrentPlayer();
+    var game = xd.getCurrentGame();
+    var currentPlayer = xd.getCurrentPlayer();
 
     if (!game) {
       return null;
@@ -59,7 +59,7 @@ Template.lobby.helpers({
     return players;
   },
   isLoading: function() {
-    var game = gl.getCurrentGame();
+    var game = xd.getCurrentGame();
     return game.state === 'lobby';
   },
 
