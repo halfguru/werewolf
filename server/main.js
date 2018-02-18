@@ -18,9 +18,8 @@ function assignRoles(players){
   var role = null;
 
   players.forEach(function(player){
-    if (!player.isSpy){
-      role = shuffled_roles.pop();
-      Players.update(player._id, {$set: {role: role.name}});
+    role = shuffled_roles.pop();
+    Players.update(player._id, {$set: {role: role.name}});
     }
   });
 }
