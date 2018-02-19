@@ -108,7 +108,6 @@ Template.night.helpers({
     return characters;
   },
   char_img: function(){
-    console.log("image taken");
     return characters[xd.getIndex()].img;
   },
 
@@ -365,7 +364,6 @@ Template.day.helpers({
   },
 
   char_img: function(){
-    console.log("image taken");
     return characters[xd.getIndex()].img;
   },
 

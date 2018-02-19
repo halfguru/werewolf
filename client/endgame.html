@@ -1,11 +1,16 @@
 <template name="endgame">
-  <h4>
-    {{#if isLoading }}
-      <span class="spinner"></span>
-    {{else}}
-      YOU WON OR LOST
-    {{/if}}
-  </h4>
+    <div class="main-menu">
+     {{#if won }}
+      <img src="img/villager.png" height="150" width="100">
+      <h4>The villagers won!</h4>
 
-  <hr>
+     {{else}}
+      <img src="img/werewolf.png" height="100" width="100">
+      <h4>The werewolves won!</h4>
+    {{/if}}
+    <hr>
+    <div class="button-container">
+      <button class="btn-back">Leave game</button>
+    </div>
+    </div>
 </template>
