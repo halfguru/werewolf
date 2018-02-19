@@ -35,7 +35,9 @@ Template.gameRole.helpers({
   description: function () {
     return characters[xd.getIndex()].description;
   },
-  gameFinished: function () {
+  char_img: function(){
+    console.log("image taken");
+    return characters[xd.getIndex()].img;
   }
 });
 
@@ -107,7 +109,10 @@ Template.night.helpers({
   characters: function () {
     return characters;
   },
-
+  char_img: function(){
+    console.log("image taken");
+    return characters[xd.getIndex()].img;
+  },
 
   players: function () {
     var game = xd.getCurrentGame();
@@ -411,11 +416,10 @@ Template.day.events({
 
   'click .btn-day-vote': function () {
     $(".btn-day-vote").attr('disabled', true);
+    Players.update(player._id, {$set: {vote: true}});
     var game = Games.findOne(Session.get("gameID"));
     var player = xd.getCurrentPlayer();
     var players = Players.find({'gameID': game._id}, {'sort': {'createdAt': 1}}).fetch();
-
-    Players.update(player._id, {$set: {vote: true}});
     var nbPlayers = Players.find({'gameID': game._id, 'state': 'alive'}).count();
     var nbPlayersVoted = Players.find({'gameID': game._id, 'vote': true}).count();
     if (nbPlayers == nbPlayersVoted){
