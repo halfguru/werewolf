@@ -64,11 +64,11 @@ Template.lobby.helpers({
   },
 
   owner: function() {
-    let playerId = Session.get("playerID");
-    let roomId = Session.get("gameID");
-    let room = Games.findOne(roomId);
+    let playerID = Session.get("playerID");
+    let gameID = Session.get("gameID");
+    let game = Games.findOne(gameID);
 
-    return playerId === room.owner;
+    return playerID === game.owner;
   },
 
     ready: function(players) {

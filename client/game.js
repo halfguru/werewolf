@@ -79,6 +79,7 @@ Template.night.rendered = function (event) {
   let player = Players.findOne(Session.get("playerID"));
   let gameID = Session.get("gameID");
   let game = Games.findOne(gameID);
+  Players.update(player._id, {$set: {vote: false}});
 
   if(game.round == 1){
     Players.update(player._id, {$set: {state: 'alive'}});
@@ -107,6 +108,7 @@ Template.night.helpers({
     return characters;
   },
 
+
   players: function () {
     var game = xd.getCurrentGame();
     var currentPlayer = xd.getCurrentPlayer();
@@ -117,8 +119,20 @@ Template.night.helpers({
     return players;
   },
 
+  alive_players: function(){
+    var game = xd.getCurrentGame();
+    var currentPlayer = xd.getCurrentPlayer();
+
+    if (!game) {
+      return null;
+   }
+
+    var players = Players.find({'gameID': game._id, 'state': 'alive'}, {'sort': {'createdAt': 1}}).fetch();
+    return players;
+  },
+
   dead: function() {
-    xd.dead();
+    return xd.dead();
   },
 
   voted: function() {
@@ -153,6 +167,11 @@ Template.night.helpers({
     return Session.get("seer_role");
   },
 
+   seer_dead: function(){
+      return seer_dead = Players.findOne({role: 'Seer'}).state == "dead";
+
+   },
+
   witch_turn: function(){
     return Games.findOne(Session.get("gameID")).turn == "witch";
   },
@@ -160,6 +179,22 @@ Template.night.helpers({
     playerID = Session.get("playerID");
     player = Players.findOne(playerID);
     return player.role == "Witch";
+  },
+
+  witch_dead: function(){
+    return witch_dead = Players.findOne({role: 'Witch'}).state == "dead";
+  },
+
+  potion_save: function() {
+    playerID = Session.get("playerID");
+    player = Players.findOne(playerID);
+    return player.potion_save == null;
+  },
+
+   potion_kill: function() {
+    playerID = Session.get("playerID");
+    player = Players.findOne(playerID);
+    return player.potion_kill == null;
   },
 
   killed_werewolf: function() {
@@ -220,20 +255,37 @@ Template.night.events({
   },
 
   'click .btn-seer': function () {
+    var witch_dead = Players.findOne({role: 'Witch'}).state == "dead";
     var game = Games.findOne(Session.get("gameID"));
-    Games.update(game._id, {$set: {state: 'day'}})
-    Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "day"}});
+    if (witch_dead){
+      Games.update(game._id, {$set: {state: 'day'}});
+    }
+    else{
+      Games.update(game._id, {$set: {turn: 'witch'}});
+    }
   },
 
   'click .btn-witch-kill': function () {
+    Players.update(player._id, {$set: {vote: true}});
 
+  },
+
+  'click .btn-witch-kill-who': function () {
+    var player = xd.getCurrentPlayer();
+    Players.update(this._id, {$set: {state: 'dead'}});
+    Players.update(this._id, {$set: {killedby: 'Witch'}});
+    Players.update(player._id, {$set: {potion_kill: true}});
+    Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {state: "day"}});
+    Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "day"}});
 
   },
 
   'click .btn-witch-save': function () {
+      var player = xd.getCurrentPlayer();
       var game = Games.findOne(Session.get("gameID"));
-      player = Players.find({'gameID': game._id, 'killedby': 'Werewolf'}).fetch()[0];
-      Players.update(player._id, {$set: {state: "alive"}});
+      var player_ww = Players.find({'gameID': game._id, 'killedby': 'Werewolf'}).fetch()[0];
+      Players.update(player_ww._id, {$set: {state: "alive"}});
+      Players.update(player._id, {$set: {potion_save: true}});
       Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {state: "day"}});
       Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "day"}});
 
@@ -310,7 +362,7 @@ Template.day.helpers({
   },
 
   dead: function() {
-    xd.dead();
+    return xd.dead();
   },
 
   deadNight: function(){
@@ -368,6 +420,10 @@ Template.day.events({
     var nbPlayersVoted = Players.find({'gameID': game._id, 'vote': true}).count();
     if (nbPlayers == nbPlayersVoted){
       Players.update(player._id, {$set: {vote: false}});
+
+
+
+
       Players.update(this._id, {$set: {state: 'dead'}});
       if (xd.win() == 1){
           Games.update(game._id, {$set: {state: 'win'}});

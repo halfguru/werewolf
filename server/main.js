@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { Session } from 'meteor/session';
 
 function cleanUpGamesAndPlayers() {
   var cutOff = moment().subtract(2, 'hours').toDate().getTime();
@@ -12,17 +13,30 @@ function cleanUpGamesAndPlayers() {
   });
 }
 
-function assignRoles(players){
+function assignRoles(players, gameID){
   var roles = characters.slice(); //shallow copy
+
+  villager = {
+    name: 'Villager',
+    description:
+    'They dont have any special power except thinking and the right to vote.'
+  };
+  var diff = Players.find({'gameID': gameID}).count() - characters.length;
+  if (Players.find({'gameID': gameID}).count() != characters.length){
+    for (var i = 0; i < diff; i++) {
+      roles.push(villager);
+    }
+  }
+
   var shuffled_roles = shuffleArray(roles);
   var role = null;
-
   players.forEach(function(player){
     role = shuffled_roles.pop();
     Players.update(player._id, {$set: {role: role.name}});
-    }
   });
 }
+
+
 
 function shuffleArray(array) {
     for (var i = array.length - 1; i > 0; i--) {
@@ -53,11 +67,11 @@ Meteor.publish('players', function(gameID) {
 });
 
 
-//WHen lobby is ready, assign roles to everyone
+//When lobby is ready, assign roles to everyone
 Games.find({"state": 'lobby'}).observeChanges({
   added: function (id, game) {
     var players = Players.find({gameID: id});
-    assignRoles(players);
+    assignRoles(players, id);
     Games.update(id, {$set: {state: 'inProgress'}});
   }
 });

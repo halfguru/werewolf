@@ -84,7 +84,7 @@
 
   <!-- Game mechanics -->
 
-  {{# if dead }}   <!-- Dead -->
+  {{#if dead }}   <!-- Dead -->
     <p>
       <h3 style="color: #BF3630;">you are dead.</h3><br />
       <span>Dead men tell no tales. Shh...</span>
@@ -95,7 +95,7 @@
   {{# if werewolf }}
   Select which player to kill
   <div class="button-container">
-    {{#each players }}
+    {{#each alive_players }}
       <button class="btn-werewolf-turn">{{ name }}</button>
        {{/each}}
   </div>
@@ -115,7 +115,7 @@
   {{ else }}   <!-- Seer turn and not voted -->
   Select which player you want to see the card
   <div class="button-container">
-    {{#each players }}
+    {{#each alive_players }}
       <button class="btn-seer-turn">{{ name }}</button>
        {{/each}}
   </div>
@@ -127,12 +127,20 @@
   {{ else if witch_turn}}
   {{# if witch }}
   {{# if voted}} <!-- Witch turn and voted -->
-    Witch turn
+  <div class="button-container">
+    {{#each alive_players }}
+      <button class="btn-witch-kill-who">{{ name }}</button>
+       {{/each}}
+  </div>
   {{ else }} <!-- Witch turn and not voted-->
   {{ killed_werewolf }} was killed by werewolves. Do you want to save this character, kill someone else, or do nothing.
    <div class="button-container">
+        {{# if potion_kill }}
         <button class="btn-witch-kill">Kill</button>
+         {{/ if }} <!-- potion kill -->
+        {{# if potion_save }}
         <button class="btn-witch-save">Save</button>
+         {{/ if }} <!-- potion save -->
         <button class="btn-witch-nothing">Do nothing</button>
     </div>
   {{/ if }}  <!-- voted -->
@@ -179,7 +187,7 @@
     {{/each}}
   </ul>
   <hr>
-  {{# if dead }}
+  {{#if dead }}
     <p>
       <h3 style="color: #BF3630;">you are dead.</h3><br />
       <span>Dead men tell no tales. Shh...</span>
@@ -192,8 +200,5 @@
       <button class="btn-day-vote">{{ name }}</button>
        {{/each}}
      </div>
-
      {{/if}}
-
-
 </template>
