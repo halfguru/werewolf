@@ -8,8 +8,7 @@ var xd = require('./gamelogic');
 //////////////
 
 Template.gameRole.rendered = function (event) {
-  xd.tts("Read your role attentively, press continue and close your eyes.");
-
+    xd.tts("Read your role attentively, press continue and close your eyes.");
 };
 
 Template.gameRole.helpers({
@@ -36,7 +35,6 @@ Template.gameRole.helpers({
     return characters[xd.getIndex()].description;
   },
   char_img: function(){
-    console.log("image taken");
     return characters[xd.getIndex()].img;
   }
 });
@@ -86,7 +84,7 @@ Template.night.rendered = function (event) {
   if(game.round == 1){
     Players.update(player._id, {$set: {state: 'alive'}});
   }
-  xd.tts("Werewolves, wake up and look for other werewolves");
+  xd.tts("It's the night, everyone is sleeping and has closed their eyes. Werewolves, wake up and look for other werewolves. Now choose your victim.");
   Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "werewolf"}});
 };
 
@@ -337,11 +335,11 @@ Template.day.rendered = function (event) {
       Games.update(game._id, {$set: {state: 'lose'}});
     }
   Players.update(player._id, {$set: {vote: false}});
-
+  xd.tts("It's daytime, the village wakes up, everyone raise their heads, open their eyes. The village will now vote for who to kill.");
   if (playerID === game.owner){
       Games.update(game._id, {$set: {round: game.round+1}});
-      xd.tts("It's daytime, the village wakes up, everyone raise their heads, open their eyes.");
     }
+
 
   //Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "werewolf"}});
 };
@@ -364,6 +362,11 @@ Template.day.helpers({
 
   characters: function () {
     return characters;
+  },
+
+  char_img: function(){
+    console.log("image taken");
+    return characters[xd.getIndex()].img;
   },
 
   dead: function() {
@@ -416,9 +419,9 @@ Template.day.events({
 
   'click .btn-day-vote': function () {
     $(".btn-day-vote").attr('disabled', true);
+    var player = xd.getCurrentPlayer();
     Players.update(player._id, {$set: {vote: true}});
     var game = Games.findOne(Session.get("gameID"));
-    var player = xd.getCurrentPlayer();
     var players = Players.find({'gameID': game._id}, {'sort': {'createdAt': 1}}).fetch();
     var nbPlayers = Players.find({'gameID': game._id, 'state': 'alive'}).count();
     var nbPlayersVoted = Players.find({'gameID': game._id, 'vote': true}).count();

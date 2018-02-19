@@ -83,9 +83,13 @@ module.exports = {
   },
 
   tts: function(speech){
-    var msg = new SpeechSynthesisUtterance(speech);
-    //window.speechSynthesis.speak(msg);
-    },
+    let game = this.getCurrentGame();
+    let playerID = Session.get("playerID");
+    if (playerID === game.owner){
+      var msg = new SpeechSynthesisUtterance(speech);
+      window.speechSynthesis.speak(msg);
+    }
+  },
 
   getIndex: function(){
     playerID =  Players.findOne(Session.get("playerID"));
@@ -170,6 +174,22 @@ module.exports = {
       return;
     }
 
+    function tts(speech){
+      let playerID = Session.get("playerID");
+      if (playerID === game.owner){
+        var msg = new SpeechSynthesisUtterance(speech);
+        window.speechSynthesis.speak(msg);
+      }
+    }
+
+    if (game.turn ==="seer"){
+        tts("Werewolves have chosen their victim. Seer, wake up and look for another player role.");
+    }
+
+    else if (game.turn ==="witch"){
+        tts("Witch, wake up and choose an action.");
+    }
+
     if(game.state === "inProgress"){
       Session.set("currentView", "gameRole");
     } else if (game.state === "waitingForPlayers") {
@@ -182,11 +202,11 @@ module.exports = {
     }
      else if (game.state === "win"){
       Session.set("currentView", "endgame");
-      console.log("you win");
+      tts("The villagers win!");
     }
      else if (game.state === "lose"){
       Session.set("currentView", "endgame");
-      console.log("you lose");
+      tts("The werewolves win!");
     }
   }
 
