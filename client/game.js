@@ -423,23 +423,33 @@ Template.day.events({
     var players = Players.find({'gameID': game._id}, {'sort': {'createdAt': 1}}).fetch();
     var nbPlayers = Players.find({'gameID': game._id, 'state': 'alive'}).count();
     var nbPlayersVoted = Players.find({'gameID': game._id, 'vote': true}).count();
+    Games.update(game._id, {$push: {dayVote: this._id}});
+    console.log("pushed this id: " + this._id);
     if (nbPlayers == nbPlayersVoted){
       Players.update(player._id, {$set: {vote: false}});
-
-
-
-
-      Players.update(this._id, {$set: {state: 'dead'}});
-      if (xd.win() == 1){
-          Games.update(game._id, {$set: {state: 'win'}});
-        }
-        else if (xd.win() == 0){
-          Games.update(game._id, {$set: {state: 'lose'}});
-        }
-        else{
-          Games.update(game._id, {$set: {state: 'night'}});
+      console.log(game.dayVote);
+      console.log(xd.voteProcess(game.dayVote));
+      if (xd.voteProcess(game.dayVote) == 0){
+        Games.update(game._id, {$set: {dayVote: ''}});
+        $(".btn-day-vote").attr('disabled', false);
       }
-    }
+      else{
+        Players.update(xd.voteProcess(game.dayVote), {$set: {state: 'dead'}});
+        if (xd.win() == 1){
+            Games.update(game._id, {$set: {state: 'win'}});
+          }
+          else if (xd.win() == 0){
+            Games.update(game._id, {$set: {state: 'lose'}});
+          }
+          else{
+            Games.update(game._id, {$set: {dayVote: ''}});
+            Games.update(game._id, {$set: {state: 'night'}});
+        }
+      }
+      }
+
+
+
 },
 
   'click .player-name-striked': function(event) {

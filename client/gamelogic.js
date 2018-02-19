@@ -120,8 +120,6 @@ module.exports = {
   dead: function(){
     playerID = Session.get("playerID");
     player = Players.findOne(playerID);
-    console.log("Is the player dead: " +  player.state);
-    console.log(player.state == "dead");
     return player.state == "dead";
   },
 
@@ -155,6 +153,57 @@ module.exports = {
     }
     return 1;
     },
+
+    highestVote: function(array){
+        if(array.length == 0)
+            return null;
+        var modeMap = {};
+        var maxEl = array[0], maxCount = 1;
+        for(var i = 0; i < array.length; i++)
+        {
+            var el = array[i];
+            if(modeMap[el] == null)
+                modeMap[el] = 1;
+            else
+                modeMap[el]++;
+            if(modeMap[el] > maxCount)
+            {
+                maxEl = el;
+                maxCount = modeMap[el];
+            }
+        }
+        return maxEl;
+        },
+
+    voteProcess: function(arr){
+        var a = [], b = [], prev;
+        arr.sort();
+        for (var i = 0; i < arr.length; i++ ) {
+            if ( arr[i] !== prev ) {
+                a.push(arr[i]);
+                b.push(1);
+            }
+            else {
+                b[b.length-1]++;
+            }
+            prev = arr[i];
+        }
+        var arr2 = [a, b];
+        var j = 0;
+        var largest = Math.max.apply(Math, arr2[1]);
+        for (var i = 0; i < arr2[1].length; i++) {
+            if (arr2[1][i] == largest){
+                j++;
+            }
+        }
+
+        if (j>1){
+            return 0;
+        }
+        else{
+            return this.highestVote(arr);
+        }
+        },
 
   trackGameState: function() {
     var gameID = Session.get("gameID");
