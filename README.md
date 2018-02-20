@@ -3,7 +3,7 @@
 
 ## About
 Werewolf was inspired by [spyfall](https://github.com/evanbrumley/spyfall) and [Drawphone](https://github.com/tannerkrewson/drawphone/).
-You can access my game on my temporary AWS EC2 server http://54.236.18.10/. The game is still in development.
+You can access my game on my temporary AWS EC2 server http://35.172.59.101/. The game is still in development.
 
 ## Installing
 #### Instructions

@@ -7,10 +7,10 @@
         <div class="player-status player-status-not-werewolf">You're the {{player.role}}</div>
         <div class="current-location">
           <div class="current-location-header">
-            Description: {{ description }}
+            {{ description }}
           </div>
         </div>
-    <img src="{{ char_img }}" height="42" width="42">
+    <img src="{{ char_img }}" height="{{ char_height }}" width="{{ char_width }}">
     </div>
   </div>
 
@@ -57,7 +57,7 @@
         <div class="player-status player-status-not-werewolf">You're the {{player.role}}</div>
         <div class="current-location">
         </div>
-    <img src="{{ char_img }}" height="42" width="42">
+    <img src="{{ char_img }}" height="{{ char_height }}" width="{{ char_width }}">
     </div>
 
   </div>
@@ -165,7 +165,7 @@
         <div class="player-status player-status-not-werewolf">You're the {{player.role}}</div>
         <div class="current-location">
         </div>
-    <img src="{{ char_img }}" height="42" width="42">
+    <img src="{{ char_img }}" height="{{ char_height }}" width="{{ char_width }}">
     </div>
   </div>
 
@@ -198,11 +198,26 @@
   </p>
   {{ else }}
 
+  {{#if hunter_turn}}
+  {{#if hunter}}
+
+  It's daytime, the Hunter, {{ hunter_dead }} died last night. He will now select which player to kill.
+  <div class="button-container">
+    {{#each alive_players }}
+      <button class="btn-hunter-turn">{{ name }}</button>
+       {{/each}}
+  </div>
+  {{ else }} <!-- Hunter turn but not hunter -->
+  It's daytime, the Hunter, {{ hunter_dead }} died last night. He will now select which player to kill.
+  {{/if}}  <!-- Identity -->
+  {{ else }} <!-- Identity -->
   It's daytime, {{ deadNight }} died. Alive players can vote for who to eliminate.
     <div class="button-container">
     {{#each alive_players }}
       <button class="btn-day-vote">{{ name }}</button>
        {{/each}}
      </div>
-     {{/if}}
+  {{/if}}  <!-- Hunter turn -->
+  {{/if}} <!-- Dead -->
+
 </template>

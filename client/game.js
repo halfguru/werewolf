@@ -36,6 +36,12 @@ Template.gameRole.helpers({
   },
   char_img: function(){
     return characters[xd.getIndex()].img;
+  },
+  char_height: function(){
+    return characters[xd.getIndex()].height;
+  },
+  char_width: function(){
+    return characters[xd.getIndex()].width;
   }
 });
 
@@ -109,6 +115,13 @@ Template.night.helpers({
   },
   char_img: function(){
     return characters[xd.getIndex()].img;
+  },
+
+  char_height: function(){
+    return characters[xd.getIndex()].height;
+  },
+  char_width: function(){
+    return characters[xd.getIndex()].width;
   },
 
   players: function () {
@@ -339,8 +352,11 @@ Template.day.rendered = function (event) {
       Games.update(game._id, {$set: {round: game.round+1}});
     }
 
-
-  //Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "werewolf"}});
+  if (Players.findOne({role: 'Hunter' })){
+      if (Players.findOne({role: 'Hunter'}).state == "dead" && game.hunterKill != 1){
+        Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "hunter"}});
+      }
+    }
 };
 
 Template.day.helpers({
@@ -367,8 +383,39 @@ Template.day.helpers({
     return characters[xd.getIndex()].img;
   },
 
+  char_height: function(){
+    return characters[xd.getIndex()].height;
+  },
+  char_width: function(){
+    return characters[xd.getIndex()].width;
+  },
+
   dead: function() {
-    return xd.dead();
+    player = xd.getCurrentPlayer();
+    if (Players.findOne({role: 'Hunter' })){
+      if (player.role != 'Hunter'){
+        return xd.dead();
+      }
+      else{
+        return Games.findOne(Session.get("gameID")).turn != "hunter";
+      }
+    }
+  },
+
+  hunter: function() {
+    playerID = Session.get("playerID");
+    player = Players.findOne(playerID);
+    return player.role == "Hunter";
+  },
+
+  hunter_turn: function(){
+    if (Players.findOne({role: 'Hunter' })){
+      return Games.findOne(Session.get("gameID")).turn == "hunter";
+    }
+  },
+
+  hunter_dead: function(){
+    return Players.findOne({role: 'Hunter' }).name;
   },
 
   deadNight: function(){
@@ -413,6 +460,14 @@ Template.day.helpers({
 Template.day.events({
   'click .btn-toggle-status': function () {
     $(".status-container-content").toggle();
+  },
+
+  'click .btn-hunter-turn': function () {
+    var player = xd.getCurrentPlayer();
+    Players.update(this._id, {$set: {state: 'dead'}});
+    Players.update(this._id, {$set: {killedby: 'Hunter'}});
+    Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "day"}});
+    Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {hunterKill: 1}});
   },
 
   'click .btn-day-vote': function () {
