@@ -13,12 +13,14 @@ module.exports = {
   },
 
   generateNewGame: function(){
+    var myArray = new Array();
     var game = {
       accessCode: module.exports.generateAccessCode(),
       state: "waitingForPlayers",
       owner: null,
       round: 1,
-      turn: null
+      turn: null,
+      dayVote: myArray
     };
 
     var gameID = Games.insert(game);
