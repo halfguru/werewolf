@@ -20,7 +20,9 @@ module.exports = {
       owner: null,
       round: 1,
       turn: null,
-      dayVote: myArray
+      dayVote: myArray,
+      dayState: null,
+          dayVoteButton: null
     };
 
     var gameID = Games.insert(game);
@@ -32,11 +34,13 @@ module.exports = {
   generateNewPlayer: function(game, name){
     var player = {
       gameID: game._id,
+      stateDay: null,
       name: name,
       role: null,
       state: null,
       vote: false,
-      killedby: null
+      killedby: null,
+      dayVoteButton: null
     };
 
     var playerID = Players.insert(player);
@@ -241,15 +245,25 @@ module.exports = {
         tts("Witch, wake up and choose an action.");
     }
 
+     else if (game.turn ==="hunter"){
+        tts("The hunter died last night. He will now choose someone to kill.");
+    }
+
+
     if(game.state === "inProgress"){
       Session.set("currentView", "gameRole");
-    } else if (game.state === "waitingForPlayers") {
+    }
+    else if (game.state === "waitingForPlayers") {
       Session.set("currentView", "lobby");
-    } else if (game.state ==="night"){
+    }
+    else if (game.state ==="night"){
       Session.set("currentView", "night");
     }
     else if (game.state ==="day"){
       Session.set("currentView", "day");
+    }
+    else if (game.state ==="dayEnd"){
+      Session.set("currentView", "dayEnd");
     }
      else if (game.state === "win"){
       Session.set("currentView", "endgame");

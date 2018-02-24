@@ -200,7 +200,6 @@
 
   {{#if hunter_turn}}
   {{#if hunter}}
-
   It's daytime, the Hunter, {{ hunter_dead }} died last night. He will now select which player to kill.
   <div class="button-container">
     {{#each alive_players }}
@@ -211,13 +210,78 @@
   It's daytime, the Hunter, {{ hunter_dead }} died last night. He will now select which player to kill.
   {{/if}}  <!-- Identity -->
   {{ else }} <!-- Identity -->
-  It's daytime, {{ deadNight }} died. Alive players can vote for who to eliminate.
+
+  {{#unless all_voted }}
+  {{#unless vote_was_equal }}
+    It's daytime, {{ deadNight }} died. Alive players can vote for who to eliminate.
     <div class="button-container">
     {{#each alive_players }}
       <button class="btn-day-vote">{{ name }}</button>
-       {{/each}}
-     </div>
+    {{/each}}
+    </div>
+  {{ else }}
+    The vote was equal. Vote again for who to eliminate.
+    <div class="button-container">
+    {{#each alive_players }}
+      <button class="btn-day-vote">{{ name }}</button>
+    {{/each}}
+    </div>
+  {{/unless}}
+  {{/unless}}
   {{/if}}  <!-- Hunter turn -->
   {{/if}} <!-- Dead -->
 
+</template>
+
+
+<template name="dayEnd">
+  <h4><a class="game-round">Round {{ round }}</a></h4>
+    <h4><a class="game-phase">Day time</a></h4>
+  <div class="status-container">
+    <button class="btn-toggle-status">show/hide</button>
+    <div class="status-container-content">
+        <div class="player-status player-status-not-werewolf">You're the {{player.role}}</div>
+        <div class="current-location">
+        </div>
+    <img src="{{ char_img }}" height="{{ char_height }}" width="{{ char_width }}">
+    </div>
+  </div>
+
+  <h5>Players</h5>
+  <ul class="ingame-player-list">
+    {{#each players }}
+      <li>
+        <div class="player-name">
+          {{ name }}
+        </div>
+      </li>
+    {{/each}}
+  </ul>
+
+  <div class="u-cf"></div>
+
+  <h5>Characters</h5>
+  <ul class="character-list">
+    {{#each characters }}
+      <li>
+        <div class="location-name">{{ name }}</div>
+      </li>
+    {{/each}}
+  </ul>
+  <hr>
+  {{#if dead }}
+    <p>
+      <h3 style="color: #BF3630;">you are dead.</h3><br />
+      <span>Dead men tell no tales. Shh...</span>
+  </p>
+  {{ else }}
+
+  <div class="current-location-header">
+    The village voted for {{village_vote}}. Press continue when you're ready and close your eyes.
+  </div>
+
+  <div class="button-container">
+    <button class="btn-continue">Continue</button>
+  </div>
+  {{/if}}
 </template>
