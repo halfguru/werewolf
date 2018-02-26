@@ -1,5 +1,5 @@
 ## Browser Werewolf Game
-![Alt Text](https://media.giphy.com/media/3Fjvhw5eNE9kSA4FBE/giphy.gif)
+![Alt Text](https://media.giphy.com/media/dANmyMDZeamv26VCjq/giphy.gif)
 
 ## About
 Werewolf was inspired by [spyfall](https://github.com/evanbrumley/spyfall) and [Drawphone](https://github.com/tannerkrewson/drawphone/).
