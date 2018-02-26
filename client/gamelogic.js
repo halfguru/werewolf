@@ -1,6 +1,10 @@
 
 module.exports = {
 
+  hasHistoryApi: function() {
+  return !!(window.history && window.history.pushState);
+  },
+
   generateAccessCode: function(){
     var code = "";
     var dict = "abcdefghijklmnopqrstuvwxyz";
@@ -17,12 +21,14 @@ module.exports = {
     var game = {
       accessCode: module.exports.generateAccessCode(),
       state: "waitingForPlayers",
+      roles: [],
       owner: null,
       round: 1,
       turn: null,
       dayVote: myArray,
       dayState: null,
-          dayVoteButton: null
+      dayVoteButton: null,
+      hunterKill: null
     };
 
     var gameID = Games.insert(game);
@@ -246,7 +252,7 @@ module.exports = {
     }
 
      else if (game.turn ==="hunter"){
-        tts("The hunter died last night. He will now choose someone to kill.");
+        tts("The hunter is dead. He will now choose someone to kill.");
     }
 
 

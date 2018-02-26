@@ -54,10 +54,28 @@
       </li>
     {{/each}}
   </ol>
-
   <hr>
-
   {{# if owner }}
-    <button class="btn-start" {{ ready players }}>start game</button>
+  Choose the characters deck composition
+
+  <form id="choose-roles-form">
+    <div id="choose-roles-list">
+      {{#each roleKeys}}
+        <div class="checkbox">
+          <label class="role-checkbox">
+            <input type="checkbox" name="{{ key }}" value="{{ key }}" class="toggle-role"
+            onclick="$(this).parent().parent().toggleClass('selected-role')"/>
+            {{ name }}<br>
+          </label>
+        </div>
+      {{/each}}
+    </div>
+    <input type="submit" class="btn btn-primary btn-lg" value='start game' />
+  </form>
+
+  {{> flashMessages}}
+  {{ else }}
+  The game owner is choosing the characters deck composition
   {{/ if }}
+
 </template>

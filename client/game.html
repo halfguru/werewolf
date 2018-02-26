@@ -276,12 +276,25 @@
   </p>
   {{ else }}
 
+  {{#if hunter_turn}}
+  The village voted for {{ village_vote }}, the Hunter. He will now select which player to kill.
+  {{#if hunter}}
+  <div class="button-container">
+    {{#each alive_players }}
+      <button class="btn-hunter-turn">{{ name }}</button>
+       {{/each}}
+  </div>
+  {{/if}}  <!-- Identity -->
+  {{ else }} <!-- Identity -->
+
   <div class="current-location-header">
-    The village voted for {{village_vote}}. Press continue when you're ready and close your eyes.
+    The village voted for {{village_vote}}.
+    Press continue when you're ready and close your eyes.
   </div>
 
   <div class="button-container">
     <button class="btn-continue">Continue</button>
   </div>
-  {{/if}}
+  {{/if}} <!-- turn -->
+  {{/if}} <!-- dead -->
 </template>

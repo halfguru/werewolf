@@ -25,5 +25,17 @@ Template.endgame.helpers({
         if (game.state === 'lose'){
             return false;
         }
+        },
+
+    players: function () {
+        var game = xd.getCurrentGame();
+        var currentPlayer = xd.getCurrentPlayer();
+
+        if (!game) {
+          return null;
         }
+
+        var players = Players.find({'gameID': game._id}, {'sort': {'createdAt': 1}}).fetch();
+        return players;
+    }
 });

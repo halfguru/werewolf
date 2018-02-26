@@ -11,10 +11,6 @@ Template.lobby.rendered = function (event) {
 
 Template.lobby.events({
   'click .btn-leave': xd.leaveGame,
-  'click .btn-start': function () {
-    var game = xd.getCurrentGame();
-    Games.update(game._id, {$set: {state: 'lobby'}});
-  },
   'click .btn-toggle-qrcode': function () {
     $(".qrcode-container").toggle();
   },
@@ -27,10 +23,47 @@ Template.lobby.events({
     xd.resetUserState();
     Session.set('urlAccessCode', game.accessCode);
     Session.set('currentView', 'joinGame');
+  },
+
+   'submit #choose-roles-form': function(event) {
+
+    /*
+    var game = xd.getCurrentGame();
+    var players = Players.find({'gameID': game._id}).count()
+    if (players > 0){
+      Games.update(game._id, {$set: {state: 'lobby'}});
+    }
+    else{
+      FlashMessages.sendError("You need at least 2 people!");
+
+    }
+    */
+    var gameID = xd.getCurrentGame()._id;
+    var players = Players.find({'gameID': gameID});
+
+    if ($('#choose-roles-form').find(':checkbox:checked').length >= players.count() + 0) {
+      var selectedRoles = $('#choose-roles-form').find(':checkbox:checked').map(function() {
+        return characters[this.value];
+      }).get();
+      Games.update(gameID, {$set: {state: 'lobby', roles: selectedRoles}});
+      Session.set('errorMessage', null);
+    } else {
+      FlashMessages.sendError('Please select at least ' + (players.count() + 0) + ' roles.');
+    }
+
+    return false;
   }
 });
 
 Template.lobby.helpers({
+
+  roleKeys: function() {
+    var roleKeys = [];
+    for (key in characters) {
+      roleKeys.push({ key : key, name : characters[key].name });
+    }
+    return roleKeys;
+  },
   game: function () {
     return xd.getCurrentGame();
   },
@@ -71,7 +104,7 @@ Template.lobby.helpers({
     return playerID === game.owner;
   },
 
-    ready: function(players) {
+  ready: function(players) {
       let attributes = {};
       if (players.length < 1) {
         attributes["disabled"] = true;

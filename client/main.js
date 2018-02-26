@@ -13,6 +13,31 @@ Handlebars.registerHelper('toCapitalCase', function (str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 });
 
+//Characters buggy
+/*
+if (xd.hasHistoryApi()){
+  function trackUrlState () {
+    var accessCode = null;
+    var game = xd.getCurrentGame();
+    if (game){
+      accessCode = game.accessCode;
+    } else {
+      accessCode = Session.get('urlAccessCode');
+    }
+
+    var currentURL = '/';
+    if (accessCode){
+      currentURL += accessCode+'/';
+    }
+    window.history.pushState(null, null, currentURL);
+  }
+  Tracker.autorun(trackUrlState);
+}
+*/
+
+window.onbeforeunload = xd.resetUserState;
+window.onpagehide = xd.resetUserState;
+
 //Whenever dependencies changes, rerun.
 Tracker.autorun(xd.trackGameState);
 

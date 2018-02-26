@@ -29,7 +29,8 @@ Template.gameRole.helpers({
 
 
   characters: function () {
-    return characters;
+    var game = xd.getCurrentGame();
+    return game.roles;
   },
   description: function () {
     return characters[xd.getIndex()].description;
@@ -122,7 +123,8 @@ Template.night.helpers({
   },
 
   characters: function () {
-    return characters;
+    var game = xd.getCurrentGame();
+    return game.roles;
   },
   char_img: function(){
     return characters[xd.getIndex()].img;
@@ -277,9 +279,8 @@ Template.night.events({
   },
 
   'click .btn-seer': function () {
-    var witch_dead = Players.findOne({role: 'Witch'}).state == "dead";
     var game = Games.findOne(Session.get("gameID"));
-    if (witch_dead){
+    if (Players.findOne({role: 'Witch'}).state == "dead"){
       Games.update(game._id, {$set: {turn: 'day'}});
       Games.update(game._id, {$set: {state: 'day'}});
     }
@@ -355,7 +356,7 @@ Template.day.rendered = function (event) {
       Games.update(game._id, {$set: {state: 'lose'}});
     }
   Players.update(player._id, {$set: {vote: false}});
-  xd.tts("It's daytime, the village wakes up, everyone raise their heads, open their eyes. The village will now vote for who to kill.");
+
   if (playerID === game.owner){
       Games.update(game._id, {$set: {round: game.round+1}});
     }
@@ -363,8 +364,13 @@ Template.day.rendered = function (event) {
   if (Players.findOne({role: 'Hunter' })){
       if (Players.findOne({role: 'Hunter'}).state == "dead" && game.hunterKill != 1){
         Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "hunter"}});
+        Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {hunterKill: 1}});
+      }
+      else{
+        xd.tts("It's daytime, the village wakes up, everyone raise their heads, open their eyes. The village will now vote for who to kill.");
       }
     }
+
 };
 
 Template.day.helpers({
@@ -384,7 +390,8 @@ Template.day.helpers({
   },
 
   characters: function () {
-    return characters;
+    var game = xd.getCurrentGame();
+    return game.roles;
   },
 
   char_img: function(){
@@ -400,13 +407,12 @@ Template.day.helpers({
 
   dead: function() {
     player = xd.getCurrentPlayer();
-    if (Players.findOne({role: 'Hunter' })){
-      if (player.role != 'Hunter'){
-        return xd.dead();
-      }
-      else{
-        return Games.findOne(Session.get("gameID")).turn != "hunter" && player.state == "dead";
-      }
+    //If player is hunter
+    if (Players.findOne({role: 'Hunter' }) && player.role == 'Hunter'){
+      return Games.findOne(Session.get("gameID")).turn != "hunter" && player.state == "dead";
+    }
+    else{
+      return xd.dead();
     }
   },
 
@@ -481,7 +487,6 @@ Template.day.helpers({
     var players = Players.find({'gameID': game._id, 'vote': true}).fetch();
     if (nbPlayers == nbPlayersVoted){
       if (xd.voteProcess(game.dayVote) == 0){
-        console.log("Votes are equal");
         //put every vote to false
         for (var i = 0; i < players.length; i++) {
           Players.update(players[i]._id, {$set: {vote: false}});
@@ -494,9 +499,9 @@ Template.day.helpers({
         }
       }
       else{
-        console.log("Votes arent equal");
         Games.update(game._id, {$set: {dayState: null}});
         Players.update(xd.voteProcess(game.dayVote), {$set: {state: 'dead'}});
+        Players.update(xd.voteProcess(game.dayVote), {$set: {killedby: 'Village'}});
         if (xd.win() == 1){
           Games.update(game._id, {$set: {state: 'win'}});
         }
@@ -536,7 +541,6 @@ Template.day.events({
     Players.update(this._id, {$set: {state: 'dead'}});
     Players.update(this._id, {$set: {killedby: 'Hunter'}});
     Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "day"}});
-    Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {hunterKill: 1}});
   },
 
   'click .btn-day-vote': function () {
@@ -560,7 +564,24 @@ Template.day.events({
 });
 
 Template.dayEnd.rendered = function (event) {
-  xd.tts("The village chose their victim. Press continue and close your eyes.");
+
+  if (xd.win() == 1){
+    Games.update(game._id, {$set: {state: 'win'}});
+  }
+  else if (xd.win() == 0){
+    Games.update(game._id, {$set: {state: 'lose'}});
+  }
+  else{
+  if (Players.findOne({role: 'Hunter' })){
+      if (Players.findOne({role: 'Hunter'}).state == "dead" && game.hunterKill != 1){
+        Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {turn: "hunter"}});
+        Games.update(Games.findOne(Session.get("gameID"))._id, {$set: {hunterKill: 1}});
+      }
+    else{
+      xd.tts("The village chose their victim. Press continue and close your eyes.");
+      }
+    }
+  }
 };
 
 Template.dayEnd.helpers({
@@ -579,7 +600,8 @@ Template.dayEnd.helpers({
   },
 
   characters: function () {
-    return characters;
+    var game = xd.getCurrentGame();
+    return game.roles;
   },
 
   char_img: function(){
@@ -595,17 +617,69 @@ Template.dayEnd.helpers({
 
   dead: function() {
     player = xd.getCurrentPlayer();
-    if (Players.findOne({role: 'Hunter' })){
-      if (player.role != 'Hunter'){
-        return xd.dead();
-      }
-      else{
-        return Games.findOne(Session.get("gameID")).turn != "hunter" && player.state == "dead";
-      }
+    //If player is hunter
+    if (Players.findOne({role: 'Hunter' }) && player.role == 'Hunter'){
+      return Games.findOne(Session.get("gameID")).turn != "hunter" && player.state == "dead";
     }
-  }
+    else{
+      return xd.dead();
+    }
+  },
+
+  alive_players: function(){
+    var game = xd.getCurrentGame();
+    var currentPlayer = xd.getCurrentPlayer();
+
+    if (!game) {
+      return null;
+   }
+
+    var players = Players.find({'gameID': game._id, 'state': 'alive'}, {'sort': {'createdAt': 1}}).fetch();
+    return players;
+  },
+
+  hunter: function() {
+    var player = xd.getCurrentPlayer();
+    return player.role == "Hunter";
+  },
+
+  hunter_turn: function(){
+    var game = xd.getCurrentGame();
+    if (Players.findOne({role: 'Hunter' })){
+      return game.turn == "hunter";
+    }
+  },
+
+  village_vote: function(){
+    var game = xd.getCurrentGame();
+    deadVillage = Players.find({'gameID': game._id, 'state': 'dead', 'killedby': 'Village'}).fetch();
+    if (deadVillage!=undefined && deadVillage.length > 0){
+      return deadVillage[0].name
+    }
+    else{
+      return "no one"
+    }
+
+  },
   });
 Template.dayEnd.events({
+
+    'click .btn-hunter-turn': function () {
+      var player = xd.getCurrentPlayer();
+      var game = xd.getCurrentGame();
+      Players.update(this._id, {$set: {state: 'dead'}});
+      Players.update(this._id, {$set: {killedby: 'Hunter'}});
+      if (xd.win() == 1){
+        Games.update(game._id, {$set: {state: 'win'}});
+      }
+      else if (xd.win() == 0){
+        Games.update(game._id, {$set: {state: 'lose'}});
+      }
+      else{
+        Games.update(game._id, {$set: {turn: "day"}});
+      }
+    },
+
     'click .btn-continue': function () {
     $(".btn-continue").attr('disabled', true);
     var game = xd.getCurrentGame();
@@ -620,12 +694,14 @@ Template.dayEnd.events({
         Players.update(players[i]._id, {$set: {vote: false}});
         Players.update(players[i]._id, {$set: {stateDay: null}});
       }
+
       Games.update(game._id, {$set: {dayVote: []}});
       Games.update(game._id, {$set: {state: 'night'}});
 
       deadWerewolf = Players.find({'gameID': game._id, 'state': 'dead', 'killedby': 'Werewolf'}).fetch();
       deadWitch = Players.find({'gameID': game._id, 'state': 'dead', 'killedby': 'Witch'}).fetch();
       deadHunter = Players.find({'gameID': game._id, 'state': 'dead', 'killedby': 'Hunter'}).fetch();
+      deadVillage = Players.find({'gameID': game._id, 'state': 'dead', 'killedby': 'Village'}).fetch();
 
       if (deadWerewolf!=undefined && deadWerewolf.length > 0){
         Players.update(deadWerewolf[0]._id, {$set: {killedby: null}});
@@ -636,6 +712,10 @@ Template.dayEnd.events({
       if (deadHunter!=undefined && deadHunter.length > 0){
         Players.update(deadHunter[0]._id, {$set: {killedby: null}});
       }
+      if (deadVillage!=undefined && deadVillage.length > 0){
+        Players.update(deadVillage[0]._id, {$set: {killedby: null}});
+      }
+
 
     }
   },

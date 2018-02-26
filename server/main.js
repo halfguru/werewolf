@@ -13,8 +13,12 @@ function cleanUpGamesAndPlayers() {
   });
 }
 
-function assignRoles(players, gameID){
-  var roles = characters.slice(); //shallow copy
+function assignRoles(players, gameID, roles){
+  //var roles = characters.slice(); //shallow copy
+  playerRoles = [];
+
+  //Old logic to add villagers if not enough roles
+  /*
 
   villager = {
     name: 'Villager',
@@ -27,9 +31,9 @@ function assignRoles(players, gameID){
       roles.push(villager);
     }
   }
+  */
 
   var shuffled_roles = shuffleArray(roles);
-  var role = null;
   players.forEach(function(player){
     role = shuffled_roles.pop();
     Players.update(player._id, {$set: {role: role.name}});
@@ -71,7 +75,7 @@ Meteor.publish('players', function(gameID) {
 Games.find({"state": 'lobby'}).observeChanges({
   added: function (id, game) {
     var players = Players.find({gameID: id});
-    assignRoles(players, id);
+    assignRoles(players, id, game.roles);
     Games.update(id, {$set: {state: 'inProgress'}});
   }
 });

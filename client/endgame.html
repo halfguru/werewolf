@@ -8,6 +8,19 @@
       <img src="img/werewolf.png" height="150" width="135">
       <h4>The werewolves won!</h4>
     {{/if}}
+
+    <h5>Players and roles</h5>
+    <ul class="ingame-player-list">
+    {{#each players }}
+      <li>
+        <div class="player-name">
+          {{ name }} : {{ role }}
+        </div>
+      </li>
+    {{/each}}
+    </ul>
+
+
     <hr>
     <div class="button-container">
       <button class="btn-back">Leave game</button>
