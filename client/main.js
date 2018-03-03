@@ -55,7 +55,7 @@ FlashMessages.configure({
 Template.main.rendered = function() {
   $.getScript("//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", function() {
     var ads, adsbygoogle;
-    ads = '<ins class="adsbygoogle" style="display:block;" data-ad-client="ca-pub-3450817379541922" data-ad-slot="4101511012" data-ad-format="auto"></ins>';
+    ads = '<ins class="adsbygoogle" style="display:block;" data-ad-client="ca-pub-4214859614114351" data-ad-slot="6349752090" data-ad-format="auto"></ins>';
     $('.adspace').html(ads);
     return (adsbygoogle = window.adsbygoogle || []).push({});
   });
