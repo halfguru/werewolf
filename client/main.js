@@ -47,7 +47,6 @@ FlashMessages.configure({
   autoScroll: false
 });
 
-
 //////////////
 /////MAIN/////
 //////////////
