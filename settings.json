@@ -1,5 +1,6 @@
 {
-  "public": {
-
+  	"PrerenderIO": {
+    "prerenderServiceUrl": "http://localhost:3000/",
+    "token": "LiSJSpbxQ6b1cPAAgw26"
   }
 }
